@@ -30,13 +30,12 @@ http://localhost:3000/api/groups - апи
 
 
 ## Конфигурация
-1) Создать файл .env.local в корне проекта
-    ```
-    # .env.local
-    DB="g:/db/vki-web.db"
-    NEXT_PUBLIC_API="http://localhost:3000/api/"
-    ```
-2) Скопировать базу данных и ./db/vki-web.db в G:\db\vki-web.db
+Создать файл .env.local в корне проекта
+```
+# .env.local
+DB="g:/vki-web/vki-web-orm.db"
+NEXT_PUBLIC_API="http://localhost:3000/api/"
+```
 
 ## Файловый раутинг Next.js - работает из папки src/app
 
@@ -65,11 +64,14 @@ http://localhost:3000/api/groups - апи
 
 
 ## Инструменты
+- ### [Debug - отладка, средства разработки браузера](docs/debug.md)
 - ### [TanStackQuery - работа с данными в приложении](docs/tanstack-query.md)
 - ### [БД SQLite](docs/db.md)
 - ### [HTTP запросы](docs/http.md)
 - ### [GIT](docs/git.md)
 
+## SSR - Server Side Rendering, передача состояния на клиент
+[читать по ссылке](docs/ssr.md)
 
 
 ## Ссылки

@@ -4,65 +4,52 @@ import useStudents from '@/hooks/useStudents';
 import type StudentInterface from '@/types/StudentInterface';
 import styles from './Students.module.scss';
 import Student from './Student/Student';
-import { useState } from 'react';
+import AddStudent, { type FormFields } from './AddStudent/AddStudent';
+import { v4 as uuidv4 } from 'uuid';
 
 const Students = (): React.ReactElement => {
-  const { students, deleteStudentMutate, addStudentMutate } = useStudents();
-  const [newStudent, setNewStudent] = useState<Omit<StudentInterface, 'id'>>({
-    firstName: '',
-    lastsName: '',
-    middleName: ''
-  });
+  const {
+    students,
+    deleteStudentMutate,
+    addStudentMutate,
+  } = useStudents();
 
+  /**
+   * Удаление студента - обработчик события нажатия "удалить"
+   * @param studentId Ид студента
+   */
   const onDeleteHandler = (studentId: number): void => {
     if (confirm('Удалить студента?')) {
+      console.log('onDeleteHandler', studentId);
+      debugger;
+
       deleteStudentMutate(studentId);
     }
   };
 
-  const onAddHandler = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (
-      newStudent.firstName.trim() &&
-      newStudent.lastsName.trim()
-    ) {
-      addStudentMutate(newStudent as StudentInterface); 
-      setNewStudent({
-        firstName: '',
-        lastsName: '',
-        middleName: ''
-      });
-    }
+  /**
+   * Добавления студента - обработчик события нажатия "добавить"
+   * @param studentFormField Форма студента
+   */
+  const onAddHandler = (studentFormField: FormFields): void => {
+    console.log('Добавление студента', studentFormField);
+    debugger;
+
+    addStudentMutate({
+      id: -1,
+      ...studentFormField,
+      groupId: 1,
+      uuid: uuidv4(),
+    });
   };
 
   return (
     <div className={styles.Students}>
-      <form onSubmit={onAddHandler} style={{ marginBottom: '1rem' }}>
-        <input
-          type="text"
-          value={newStudent.firstName}
-          onChange={e => setNewStudent({ ...newStudent, firstName: e.target.value })}
-          placeholder="Имя"
-          required
-        />
-        <input
-          type="text"
-          value={newStudent.lastsName}
-          onChange={e => setNewStudent({ ...newStudent, lastsName: e.target.value })}
-          placeholder="Фамилия"
-          required
-        />
-        <input
-          type="text"
-          value={newStudent.middleName}
-          onChange={e => setNewStudent({ ...newStudent, middleName: e.target.value })}
-          placeholder="Отчество"
-        />
-        <button type="submit">Добавить студента</button>
-      </form>
+      <AddStudent onAdd={onAddHandler} />
+
       {students.map((student: StudentInterface) => (
         <Student
-          key={student.id || Math.random()}
+          key={student.id || student.uuid}
           student={student}
           onDelete={onDeleteHandler}
         />

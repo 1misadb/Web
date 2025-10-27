@@ -3,6 +3,8 @@
   display: grid;
   gap: 10px;
   grid-template-columns: 370px auto;
+
+  transition: opacity 0.9s ease-in-out;
 }
 
 .--isDeleted {
@@ -11,8 +13,14 @@
   
   button {
     display: none;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.5s ease-in-out, display 0.5s ease-in-out;
+  }
+}
+
+.--isNew {
+  opacity: 0.5;
+  
+  
+  button {
+    display: none;
   }
 }
