@@ -52,11 +52,6 @@ export const deleteStudentDb = async (studentId: number): Promise<number> => {
   return studentId;
 };
 
-/**
- * Добавление  рандомных студента
- * @param mount количество добавляемых записей - 10 по умолчанию
- * @returns
- */
 export const addRandomStudentsDb = async (amount: number = 10): Promise<FioInterface[]> => {
   const db = new sqlite3.Database(process.env.DB ?? './db/vki-web.db');
 
@@ -82,4 +77,39 @@ export const addRandomStudentsDb = async (amount: number = 10): Promise<FioInter
   });
 
   return fios;
+};
+export const addStudentDb = async (
+  studentData: Omit<StudentInterface, 'id'>
+): Promise<StudentInterface | null> => {
+  const db = new sqlite3.Database(process.env.DB ?? './db/vki-web.db');
+
+  const { firstName, lastsName: lastName, middleName } = studentData;
+
+  const newStudent = await new Promise<StudentInterface | null>((resolve, reject) => {
+    const sql = `
+      INSERT INTO student (firstName, lastName, middleName, groupId)
+      VALUES (?, ?, ?, ?)
+    `;
+    db.run(sql, [firstName, lastName, middleName, 1], function (err) {
+      if (err) {
+        console.error('Ошибка добавления студента:', err);
+        reject(err);
+        db.close();
+        return;
+      }
+
+      
+      const insertedStudent: StudentInterface = {
+        id: this.lastID,
+        firstName,
+        lastsName: lastName, 
+        middleName,
+      };
+
+      resolve(insertedStudent);
+      db.close();
+    });
+  });
+
+  return newStudent;
 };
