@@ -84,7 +84,7 @@ const useStudents = (): StudentsHookInterface => {
       // получаем данные из TanStackQuery
       const previousStudents = queryClient.getQueryData<StudentInterface[]>(['students']);
       const updatedStudents = [...(previousStudents ?? [])];
-
+      debugger;
       if (!updatedStudents) return;
 
       // добавляем временную запись
@@ -92,9 +92,10 @@ const useStudents = (): StudentsHookInterface => {
         ...student,
         isNew: true,
       });
+      debugger;
       // обновляем данные в TanStackQuery
       queryClient.setQueryData<StudentInterface[]>(['students'], updatedStudents);
-
+      debugger;
       return { previousStudents, updatedStudents };
     },
     onError: (err, variables, context) => {
@@ -103,6 +104,7 @@ const useStudents = (): StudentsHookInterface => {
     },
     // обновляем данные в случаи успешного выполнения mutationFn: async (student: StudentInterface) => addStudentApi(student)
     onSuccess: async (newStudent, variables, { previousStudents }) => {
+      debugger;
       refetch();
       // await queryClient.cancelQueries({ queryKey: ['students'] });
 
