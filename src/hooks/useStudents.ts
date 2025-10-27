@@ -99,6 +99,7 @@ const useStudents = (): StudentsHookInterface => {
       return { previousStudents, updatedStudents };
     },
     onError: (err, variables, context) => {
+      debugger;
       console.log('>>> deleteStudentMutate  err', err);
       queryClient.setQueryData<StudentInterface[]>(['students'], context?.previousStudents);
     },
