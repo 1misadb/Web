@@ -45,7 +45,7 @@ export const addStudentApi = async (student: StudentInterface): Promise<StudentI
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(student),
     });
-
+    debugger;
     if (!response.ok) {
       throw new Error(`Ошибка HTTP: ${response.status}`);
     }
@@ -54,6 +54,7 @@ export const addStudentApi = async (student: StudentInterface): Promise<StudentI
   }
   catch (err) {
     console.log('>>> addStudentApi', err);
+    debugger;
     throw err;
   }
 };
