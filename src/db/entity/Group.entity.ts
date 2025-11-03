@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Student } from './Student.entity';
+import type { Student } from './Student.entity';
+
 @Entity()
 export class Group {
   @PrimaryGeneratedColumn()
@@ -11,6 +12,10 @@ export class Group {
   @Column()
   contacts!: string;
 
-  @OneToMany(() => Student, (student: Student) => student.group)
-  students!: Student[];
+  // avoid circular static import — require default export of Student at runtime
+  @OneToMany(() => require('./Student.entity').default, (student: any) => student.group)
+  students!: any[];
 }
+
+// make default export as well to ensure require(...).default resolves consistently
+export default Group;

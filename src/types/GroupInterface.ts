@@ -1,7 +1,7 @@
-interface GroupInterface {
+import type StudentInterface from './StudentInterface';
+
+export default interface GroupInterface {
   id: number;
   name: string;
-  contacts: string;
-};
-
-export default GroupInterface;
+  students?: StudentInterface[];
+}
