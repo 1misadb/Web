@@ -1,59 +1,78 @@
 import { Student } from './entity/Student.entity';
 import type StudentInterface from '@/types/StudentInterface';
 import getRandomFio from '@/utils/getRandomFio';
-import AppDataSource from './AppDataSource';
+import { getDataSource, initializeDatabase } from './AppDataSource';
 
-const studentRepository = AppDataSource.getRepository(Student);
-
-/**
- * Получение студентов
- * @returns Promise<StudentInterface[]>
- */
-export const getStudentsDb = async (): Promise<StudentInterface[]> => {
-  return await studentRepository.find();
+const getStudentRepository = async () => {
+  await initializeDatabase();
+  return getDataSource().getRepository(Student);
 };
 
 /**
- * Удаления студента
- * @param studentId ИД удаляемого студента
- * @returns Promise<number>
+ * Получение студентов
+ */
+export const getStudentsDb = async (): Promise<StudentInterface[]> => {
+  const repository = await getStudentRepository();
+  // Явно загружаем связанную группу
+  return await repository.find({
+    relations: ['group'] // это загрузит связанные группы
+  });
+};
+
+/**
+ * Удаление студента
  */
 export const deleteStudentDb = async (studentId: number): Promise<number> => {
-  await studentRepository.delete(studentId);
+  const repository = await getStudentRepository();
+  await repository.delete(studentId);
   return studentId;
 };
 
 /**
  * Добавление студента
- * @param studentField поля студента
- * @returns Promise<StudentInterface>
  */
 export const addStudentDb = async (studentFields: Omit<StudentInterface, 'id'>): Promise<StudentInterface> => {
+  const repository = await getStudentRepository();
   const student = new Student();
-  const newStudent = await studentRepository.save({
+  
+  // Создаем студента с группой
+  const newStudent = await repository.save({
     ...student,
     ...studentFields,
   });
-  return newStudent;
+  
+  // Загружаем студента с группой для возврата
+  return await repository.findOne({
+    where: { id: newStudent.id },
+    relations: ['group']
+  }) as StudentInterface;
 };
 
 /**
- * Добавление рандомных студента
- * @param amount количество рандомных записей
- * @returns Promise<StudentInterface>
+ * Добавление рандомных студентов
  */
 export const addRandomStudentsDb = async (amount: number = 10): Promise<StudentInterface[]> => {
+  const repository = await getStudentRepository();
   const students: StudentInterface[] = [];
 
   for (let i = 0; i < amount; i++) {
     const fio = getRandomFio();
 
-    const newStudent = await addStudentDb({
+    const student = new Student();
+    const newStudent = await repository.save({
+      ...student,
       ...fio,
       contacts: 'contact',
       groupId: 1,
     });
-    students.push(newStudent);
+    
+    // Загружаем с группой
+    const studentWithGroup = await repository.findOne({
+      where: { id: newStudent.id },
+      relations: ['group']
+    }) as StudentInterface;
+    
+    students.push(studentWithGroup);
   }
 
   return students;

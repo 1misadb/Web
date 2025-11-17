@@ -5,33 +5,34 @@ import { Student } from './entity/Student.entity';
 
 const AppDataSource = new DataSource({
   type: 'sqlite',
-  database: process.env.DB ?? './db/vki-web.db', // Path to your SQLite database file
+  database: process.env.DB ?? './db/vki-web.db',
   entities: [Group, Student],
-  synchronize: true, // Auto-create schema on startup (use with caution in production)
+  synchronize: true,
   logging: false,
 });
 
-// to initialize the initial connection with the database, register all entities
-// and "synchronize" database schema, call "initialize()" method of a newly created database
-// once in your application bootstrap
-// const init = async (): Promise<void> => {
-//   try {
-//     await AppDataSource.initialize();
-//   }
-//   catch (error) {
-//     console.log(error);
-//   }
-// };
+let initializationPromise: Promise<void> | null = null;
 
-// init();
+export const initializeDatabase = async (): Promise<void> => {
+  if (!initializationPromise) {
+    initializationPromise = AppDataSource.initialize()
+      .then(() => {
+        console.log('Data Source has been initialized!');
+      })
+      .catch((err) => {
+        console.error('Error during Data Source initialization:', err);
+        initializationPromise = null; 
+        throw err;
+      });
+  }
+  return initializationPromise;
+};
 
-AppDataSource.initialize()
-  .then(() => {
-    console.log('Data Source has been initialized!');
-    // You can now interact with your entities
-  })
-  .catch((err) => {
-    console.error('Error during Data Source initialization:', err);
-  });
+export const getDataSource = (): DataSource => {
+  if (!AppDataSource.isInitialized) {
+    throw new Error('DataSource not initialized. Call initializeDatabase() first.');
+  }
+  return AppDataSource;
+};
 
 export default AppDataSource;
