@@ -42,7 +42,6 @@ const ensureSeedUsers = async (): Promise<void> => {
     }));
   } catch (error) {
     console.error('Error seeding users:', error);
-    // Не пробрасываем ошибку, чтобы не блокировать инициализацию БД
   }
 };
 
