@@ -1,4 +1,5 @@
 import { dehydrate } from '@tanstack/react-query';
+import { cookies } from 'next/headers';
 import 'reflect-metadata';
 import TanStackQuery from '@/containers/TanStackQuery';
 import queryClient from '@/api/reactQueryClient';
@@ -12,6 +13,7 @@ import type { Metadata } from 'next';
 import '@/styles/globals.scss';
 import { META_DESCRIPTION, META_TITLE } from '@/constants/meta';
 import { getStudentsApi } from '@/api/studentsApi';
+import { verifyAccessToken } from '@/utils/jwt';
 
 export const metadata: Metadata = {
   title: META_TITLE,
@@ -19,6 +21,19 @@ export const metadata: Metadata = {
 };
 
 const RootLayout = async ({ children }: Readonly<{ children: React.ReactNode }>): Promise<React.ReactElement> => {
+  const cookieStore = await cookies();
+
+  const accessToken = cookieStore.get('accessToken')?.value;
+
+  const tokenData = verifyAccessToken(accessToken);
+  const userFromServer = tokenData ? {
+    id: tokenData.sub,
+    email: tokenData.email,
+    fullName: tokenData.fullName,
+    password: '',
+    isActive: true,
+  } : undefined;
+
   // выполняется на сервере - загрузка групп
   await queryClient.prefetchQuery({
     queryKey: ['groups'],
@@ -38,7 +53,9 @@ const RootLayout = async ({ children }: Readonly<{ children: React.ReactNode }>)
     <TanStackQuery state={state}>
       <html lang="ru">
         <body>
-          <Header />
+          <Header
+            userFromServer={userFromServer}
+          />
           <Main>
             <>{children}</>
           </Main>
