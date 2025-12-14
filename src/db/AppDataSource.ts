@@ -1,73 +1,51 @@
 import 'reflect-metadata';
-import { DataSource } from 'typeorm';
-import { Group } from './entity/Group.entity';
+import { DataSource, type DataSourceOptions } from 'typeorm';
 import { Student } from './entity/Student.entity';
+import { Group } from './entity/Group.entity';
 import { User } from './entity/User.entity';
-import { hashPassword } from '@/utils/password';
 
-const AppDataSource = new DataSource({
-  type: 'sqlite',
-  database: process.env.DB ?? './db/vki-web.db',
-  entities: [Group, Student, User],
-  synchronize: true,
+const timeout = 30000;
+
+const config: DataSourceOptions = {
+  ...(process.env.POSTGRES
+    ? {
+      type: 'postgres',
+      url: process.env.POSTGRES,
+      ssl: true,
+      connectTimeoutMS: timeout,
+      extra: {
+        ssl: { rejectUnauthorized: false },
+        connectionTimeoutMillis: timeout,
+        query_timeout: timeout,
+        idle_in_transaction_session_timeout: timeout,
+      },
+    }
+    : {
+      type: 'sqlite',
+      database: process.env.DB ?? './db/vki-web.db',
+    }),
+  synchronize: process.env.NODE_ENV !== 'production',
+  migrationsRun: process.env.NODE_ENV === 'production',
   logging: false,
-});
+  entities: [Student, Group, User],
+};
 
-let initializationPromise: Promise<void> | null = null;
+const AppDataSource = new DataSource(config);
 
-const ensureSeedUsers = async (): Promise<void> => {
+export const dbInit = async (): Promise<void> => {
   try {
-    const repository = AppDataSource.getRepository(User);
-    const defaultUsers = [
-      {
-        email: 'admin@example.com',
-        fullName: 'Администратор системы',
-        password: hashPassword('admin123'),
-      },
-      {
-        email: 'manager@example.com',
-        fullName: 'Менеджер проекта',
-        password: hashPassword('manager123'),
-      },
-    ];
-
-    await Promise.all(defaultUsers.map(async user => {
-      const exists = await repository.findOne({
-        where: { email: user.email },
-      });
-
-      if (!exists) {
-        await repository.save(repository.create(user));
-      }
-    }));
-  } catch (error) {
-    console.error('Error seeding users:', error);
+    if (AppDataSource.isInitialized) {
+      return;
+    }
+    await AppDataSource.initialize();
+    console.log('✅ Database initialized successfully');
+  }
+  catch (error) {
+    console.error('❌ Database initialization error:', error);
+    throw error;
   }
 };
 
-export const initializeDatabase = async (): Promise<void> => {
-  if (!initializationPromise) {
-    initializationPromise = AppDataSource.initialize()
-      .then(async () => {
-        console.log('Data Source has been initialized!');
-        if (AppDataSource.isInitialized) {
-          await ensureSeedUsers();
-        }
-      })
-      .catch((err) => {
-        console.error('Error during Data Source initialization:', err);
-        initializationPromise = null; 
-        throw err;
-      });
-  }
-  return initializationPromise;
-};
-
-export const getDataSource = (): DataSource => {
-  if (!AppDataSource.isInitialized) {
-    throw new Error('DataSource not initialized. Call initializeDatabase() first.');
-  }
-  return AppDataSource;
-};
+// await dbInit();
 
 export default AppDataSource;

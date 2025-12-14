@@ -12,9 +12,9 @@ export class Group {
   @Column()
   contacts!: string;
 
-  @OneToMany(() => Student, (student) => student.group, {
+  @OneToMany(() => Student, student => student.group, {
     cascade: true,
-    eager: false 
+    eager: false,
   })
   students!: Student[];
 }

@@ -1,12 +1,12 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { userService } from '@/services/UserService';
 import { signJwt } from '@/utils/jwt';
-import { initializeDatabase } from '@/db/AppDataSource';
+import { dbInit } from '@/db/AppDataSource';
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
-    await initializeDatabase();
-    
+    await dbInit();
+
     const body = await request.json();
     const { email, password } = body ?? {};
 
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
       path: '/',
-      maxAge: 2 * 2, 
+      maxAge: 2 * 2,
     });
 
     return response;
@@ -61,4 +61,3 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
   }
 }
-

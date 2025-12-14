@@ -1,6 +1,6 @@
-import FioInterface from "@/types/FioInterface";
-import capitalize from "./capitalize";
-import getRandomNumber from "./getRandomNumber";
+import type FioInterface from '@/types/FioInterface';
+import capitalize from './capitalize';
+import getRandomNumber from './getRandomNumber';
 
 const part1 = [
   'орел',
@@ -168,7 +168,6 @@ const part3 = [
   'трудолюбивый',
   'умный',
 ];
-
 
 export const getRandomFio = (): FioInterface => {
   const firstName = capitalize(part1[getRandomNumber(part1.length)]);

@@ -1,10 +1,10 @@
 import { Group } from './entity/Group.entity';
-import { getDataSource, initializeDatabase } from './AppDataSource';
+import AppDataSource, { dbInit } from './AppDataSource';
 import type GroupInterface from '@/types/GroupInterface';
 
-const getGroupRepository = async () => {
-  await initializeDatabase();
-  return getDataSource().getRepository(Group);
+const getGroupRepository = async (): Promise<ReturnType<typeof AppDataSource.getRepository>> => {
+  await dbInit();
+  return AppDataSource.getRepository(Group);
 };
 
 /**
@@ -14,8 +14,8 @@ export const getGroupsDb = async (): Promise<GroupInterface[]> => {
   const repository = await getGroupRepository();
   // Явно загружаем связанных студентов
   return await repository.find({
-    relations: ['students'] // это загрузит связанных студентов
-  });
+    relations: ['students'], // это загрузит связанных студентов
+  }) as GroupInterface[];
 };
 
 /**
@@ -28,10 +28,10 @@ export const addGroupsDb = async (groupFields: Omit<GroupInterface, 'id'>): Prom
     ...group,
     ...groupFields,
   });
-  
+
   // Загружаем группу со студентами для возврата
   return await repository.findOne({
     where: { id: newGroup.id },
-    relations: ['students']
+    relations: ['students'],
   }) as GroupInterface;
 };

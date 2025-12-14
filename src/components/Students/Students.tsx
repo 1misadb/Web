@@ -6,7 +6,7 @@ import Student from './Student/Student';
 import AddStudent, { type FormFields } from './AddStudent/AddStudent'; // ← ИМПОРТ + ТИП
 import { v4 as uuidv4 } from 'uuid';
 
-const Students = () => {
+const Students = (): React.ReactElement => {
   const {
     students,
     deleteStudent,
@@ -14,7 +14,7 @@ const Students = () => {
     isLoading,
   } = useStudents();
 
-  const handleAdd = (form: FormFields) => {
+  const handleAdd = (form: FormFields): void => {
     addStudent({
       id: -1,
       uuid: uuidv4(),
@@ -29,7 +29,7 @@ const Students = () => {
       <AddStudent onAdd={handleAdd} />
 
       <div className="mt-6 space-y-4">
-        {students.map((student) => (
+        {students.map(student => (
           <Student
             key={student.id || student.uuid}
             student={student}

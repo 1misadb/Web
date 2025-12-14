@@ -5,4 +5,3 @@ export default interface UserInterface {
   password: string;
   isActive: boolean;
 }
-

@@ -13,7 +13,7 @@ export class UserService {
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return await this.repository.findOne({ where: { email } });
+    return await this.repository.findOne({ where: { email } }) as User;
   }
 
   async createUser(userData: Omit<UserInterface, 'id' | 'password'> & { password: string }): Promise<User> {
@@ -22,7 +22,7 @@ export class UserService {
       password: hashPassword(userData.password),
     });
 
-    return await this.repository.save(user);
+    return await this.repository.save(user) as User;
   }
 
   async verifyCredentials(email: string, password: string): Promise<User | null> {
@@ -43,4 +43,3 @@ export class UserService {
 }
 
 export const userService = new UserService();
-

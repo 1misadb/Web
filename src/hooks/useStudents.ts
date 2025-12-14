@@ -7,13 +7,21 @@ import {
 import { addStudentApi, deleteStudentApi, getStudentsApi } from '@/api/studentsApi';
 import type StudentInterface from '@/types/StudentInterface';
 
-export const useStudents = () => {
+export const useStudents = (): {
+  students: StudentInterface[];
+  isLoading: boolean;
+  error: Error | null;
+  deleteStudent: (id: number) => void;
+  addStudent: (student: StudentInterface) => void;
+  isDeleting: boolean;
+  isAdding: boolean;
+} => {
   const queryClient = useQueryClient();
 
-  const { data = [], isLoading, error, refetch } = useQuery({
+  const { data = [], isLoading, error } = useQuery({
     queryKey: ['students'],
     queryFn: getStudentsApi,
-    enabled: true, 
+    enabled: true,
   });
 
   const deleteStudentMutation = useMutation({
@@ -23,13 +31,13 @@ export const useStudents = () => {
       const previous = queryClient.getQueryData<StudentInterface[]>(['students']) || [];
 
       const updated = previous.map(s =>
-        s.id === studentId ? { ...s, isDeleted: true } : s
+        s.id === studentId ? { ...s, isDeleted: true } : s,
       );
 
       queryClient.setQueryData(['students'], updated);
       return { previous };
     },
-    onError: (err, studentId, context) => {
+    onError: (_err, _studentId, context) => {
       queryClient.setQueryData(['students'], context?.previous);
     },
     onSuccess: (deletedId) => {
@@ -53,13 +61,13 @@ export const useStudents = () => {
       queryClient.setQueryData(['students'], [...previous, optimisticStudent]);
       return { previous };
     },
-    onError: (err, newStudent, context) => {
+    onError: (_err, _newStudent, context) => {
       queryClient.setQueryData(['students'], context?.previous);
     },
     onSuccess: (createdStudent) => {
       // Заменяем временную запись на реальную
       queryClient.setQueryData<StudentInterface[]>(['students'], (old = []) =>
-        old.map(s => (s.isNew ? createdStudent : s))
+        old.map(s => (s.isNew ? createdStudent : s)),
       );
     },
   });

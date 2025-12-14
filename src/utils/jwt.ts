@@ -12,8 +12,7 @@ const base64UrlEncode = (input: Buffer | string): string => {
 };
 
 const getJwtSecret = (): string => {
-  // const secret = process.env.JWT_SECRET;
-  const secret = 'secret';
+  const secret = process.env.JWT_SECRET;
 
   if (!secret) {
     throw new Error('JWT_SECRET is not set');
@@ -58,11 +57,24 @@ export const verifyAccessToken = (token?: string): { sub: number; email: string;
     return null;
   }
   try {
-    const decoded = jwt.verify(token, getJwtSecret()) as { sub: number; email: string; fullName: string };
-    return decoded;
+    const decoded = jwt.verify(token, getJwtSecret());
+
+    // Проверяем, что decoded это объект, а не строка
+    if (typeof decoded === 'string') {
+      return null;
+    }
+
+    // Безопасное приведение типа через unknown
+    const payload = decoded as unknown as { sub: number; email: string; fullName: string };
+
+    // Проверяем наличие обязательных полей
+    if (typeof payload.sub === 'number' && typeof payload.email === 'string' && typeof payload.fullName === 'string') {
+      return payload;
+    }
+
+    return null;
   }
-  catch (error) {
+  catch {
     return null;
   }
 };
-

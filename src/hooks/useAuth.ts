@@ -10,4 +10,3 @@ export const useAuth = create<AuthState>(set => ({
   user: undefined,
   setUser: (user): void => set(state => ({ ...state, user })),
 }));
-

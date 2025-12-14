@@ -28,7 +28,6 @@ const LoginForm = (): ReactNode => {
     },
   });
 
-
   const onSubmit = async (values: LoginFormValues): Promise<void> => {
     setError(null);
     setSuccess(null);
@@ -49,7 +48,7 @@ const LoginForm = (): ReactNode => {
       setUser(data.user);
       window.localStorage.setItem('accessToken', data.token);
       setSuccess('Вход выполнен! Токен сохранен в localStorage.');
-      
+
       // Редирект на главную страницу после успешного входа
       setTimeout(() => {
         router.push('/');
@@ -115,4 +114,3 @@ const LoginForm = (): ReactNode => {
 };
 
 export default LoginForm;
-

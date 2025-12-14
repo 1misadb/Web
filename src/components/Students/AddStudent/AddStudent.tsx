@@ -66,18 +66,20 @@ const AddStudent = ({ onAdd }: Props): React.ReactElement => {
           disabled={isLoading}
           className="w-full p-2 border rounded"
         >
-          {isLoading ? (
-            <option>Загрузка групп...</option>
-          ) : (
-            <>
-              <option value="">— Выберите группу —</option>
-              {groups.map((group: GroupInterface) => ( // ← ЯВНО УКАЗАТЬ ТИП
-                <option key={group.id} value={group.id}>
-                  {group.name}
-                </option>
-              ))}
-            </>
-          )}
+          {isLoading
+            ? (
+              <option>Загрузка групп...</option>
+            )
+            : (
+              <>
+                <option value="">— Выберите группу —</option>
+                {groups.map((group: GroupInterface) => ( // ← ЯВНО УКАЗАТЬ ТИП
+                  <option key={group.id} value={group.id}>
+                    {group.name}
+                  </option>
+                ))}
+              </>
+            )}
         </select>
         {errors.groupId && <div className="text-red-500 text-sm">{errors.groupId.message}</div>}
 

@@ -1,2 +1,3 @@
-GET http://localhost:3000/api/init-db
-   Content-Type: application/json
+### Инициализация БД (создание таблиц)
+GET http://localhost:3000/api/db/init
+Content-Type: application/json

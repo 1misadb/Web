@@ -26,13 +26,15 @@ const RootLayout = async ({ children }: Readonly<{ children: React.ReactNode }>)
   const accessToken = cookieStore.get('accessToken')?.value;
 
   const tokenData = verifyAccessToken(accessToken);
-  const userFromServer = tokenData ? {
-    id: tokenData.sub,
-    email: tokenData.email,
-    fullName: tokenData.fullName,
-    password: '',
-    isActive: true,
-  } : undefined;
+  const userFromServer = tokenData
+    ? {
+      id: tokenData.sub,
+      email: tokenData.email,
+      fullName: tokenData.fullName,
+      password: '',
+      isActive: true,
+    }
+    : undefined;
 
   // выполняется на сервере - загрузка групп
   await queryClient.prefetchQuery({

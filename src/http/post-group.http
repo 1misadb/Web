@@ -1,0 +1,9 @@
+### Добавление новой группы
+POST http://localhost:3000/api/groups
+Content-Type: application/json
+
+{
+  "name": "Group-5",
+  "contacts": "group5@test.test"
+}
+

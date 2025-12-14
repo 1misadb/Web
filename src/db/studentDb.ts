@@ -1,11 +1,11 @@
 import { Student } from './entity/Student.entity';
 import type StudentInterface from '@/types/StudentInterface';
 import getRandomFio from '@/utils/getRandomFio';
-import { getDataSource, initializeDatabase } from './AppDataSource';
+import AppDataSource, { dbInit } from './AppDataSource';
 
-const getStudentRepository = async () => {
-  await initializeDatabase();
-  return getDataSource().getRepository(Student);
+const getStudentRepository = async (): Promise<ReturnType<typeof AppDataSource.getRepository>> => {
+  await dbInit();
+  return AppDataSource.getRepository(Student);
 };
 
 /**
@@ -15,8 +15,8 @@ export const getStudentsDb = async (): Promise<StudentInterface[]> => {
   const repository = await getStudentRepository();
   // Явно загружаем связанную группу
   return await repository.find({
-    relations: ['group'] // это загрузит связанные группы
-  });
+    relations: ['group'], // это загрузит связанные группы
+  }) as StudentInterface[];
 };
 
 /**
@@ -34,17 +34,17 @@ export const deleteStudentDb = async (studentId: number): Promise<number> => {
 export const addStudentDb = async (studentFields: Omit<StudentInterface, 'id'>): Promise<StudentInterface> => {
   const repository = await getStudentRepository();
   const student = new Student();
-  
+
   // Создаем студента с группой
   const newStudent = await repository.save({
     ...student,
     ...studentFields,
   });
-  
+
   // Загружаем студента с группой для возврата
   return await repository.findOne({
     where: { id: newStudent.id },
-    relations: ['group']
+    relations: ['group'],
   }) as StudentInterface;
 };
 
@@ -65,13 +65,13 @@ export const addRandomStudentsDb = async (amount: number = 10): Promise<StudentI
       contacts: 'contact',
       groupId: 1,
     });
-    
+
     // Загружаем с группой
     const studentWithGroup = await repository.findOne({
       where: { id: newStudent.id },
-      relations: ['group']
+      relations: ['group'],
     }) as StudentInterface;
-    
+
     students.push(studentWithGroup);
   }
 
