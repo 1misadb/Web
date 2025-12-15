@@ -21,12 +21,7 @@ export class Student {
   @Column({ default: '' })
   contacts?: string;
 
-  @ManyToOne(() => {
-    // Ленивая загрузка для избежания циклической зависимости
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { Group } = require('./Group.entity');
-    return Group;
-  }, (group: Group) => group.students)
+  @ManyToOne('Group', 'students')
   @JoinColumn({ name: 'groupId' })
   group!: Group;
 
