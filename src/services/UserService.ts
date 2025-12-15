@@ -29,15 +29,19 @@ export class UserService {
     const user = await this.findByEmail(email);
 
     if (!user) {
+      console.log('User not found in database:', email);
       return null;
     }
 
+    console.log('User found:', { email: user.email, isActive: user.isActive });
     const isValid = verifyPassword(password, user.password);
 
     if (!isValid) {
+      console.log('Password verification failed for:', email);
       return null;
     }
 
+    console.log('Password verification successful for:', email);
     return user;
   }
 }

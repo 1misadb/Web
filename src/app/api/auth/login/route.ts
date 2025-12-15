@@ -17,10 +17,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
+    console.log('Login attempt for email:', email);
     const user = await userService.verifyCredentials(email, password);
 
     if (!user) {
-      console.log('User not found:', email);
+      console.log('❌ Login failed: User not found or invalid password for:', email);
       return NextResponse.json(
         { message: 'Неверный логин или пароль' },
         { status: 401 },
@@ -28,12 +29,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     if (!user.isActive) {
-      console.log('User is not active:', email);
+      console.log('❌ Login failed: User is not active for:', email);
       return NextResponse.json(
         { message: 'Неверный логин или пароль' },
         { status: 401 },
       );
     }
+
+    console.log('✅ Login successful for:', email);
 
     const token = signJwt({
       sub: user.id,
