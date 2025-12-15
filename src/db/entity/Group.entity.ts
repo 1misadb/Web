@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Student } from './Student.entity';
+import type { Student } from './Student.entity';
 
 @Entity('groups')
 export class Group {
@@ -12,7 +12,11 @@ export class Group {
   @Column()
   contacts!: string;
 
-  @OneToMany(() => Student, student => student.group, {
+  @OneToMany(() => {
+    // Динамический импорт для избежания циклической зависимости
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    return require('./Student.entity').Student;
+  }, (student: Student) => student.group, {
     cascade: true,
     eager: false,
   })

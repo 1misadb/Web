@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
-import { Group } from './Group.entity';
+import type { Group } from './Group.entity';
 
 @Entity('students')
 export class Student {
@@ -21,7 +21,11 @@ export class Student {
   @Column({ default: '' })
   contacts?: string;
 
-  @ManyToOne(() => Group, group => group.students)
+  @ManyToOne(() => {
+    // Динамический импорт для избежания циклической зависимости
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    return require('./Group.entity').Group;
+  }, (group: Group) => group.students)
   @JoinColumn({ name: 'groupId' })
   group!: Group;
 
