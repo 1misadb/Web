@@ -39,10 +39,53 @@ export const dbInit = async (): Promise<void> => {
     }
     await AppDataSource.initialize();
     console.log('✅ Database initialized successfully');
+    
+    // Автоматически создаем тестовых пользователей, если их нет
+    await createDefaultUsersIfNeeded();
   }
   catch (error) {
     console.error('❌ Database initialization error:', error);
     throw error;
+  }
+};
+
+// Функция для создания тестовых пользователей
+const createDefaultUsersIfNeeded = async (): Promise<void> => {
+  try {
+    const { hashPassword } = await import('@/utils/password');
+    const { User } = await import('./entity/User.entity');
+    
+    const defaultUsers = [
+      {
+        email: 'admin@example.com',
+        fullName: 'Администратор Системы',
+        password: hashPassword('admin123'),
+        isActive: true,
+      },
+      {
+        email: 'manager@example.com',
+        fullName: 'Менеджер Учебного Отдела',
+        password: hashPassword('manager123'),
+        isActive: true,
+      },
+    ];
+
+    const repository = AppDataSource.getRepository(User);
+    
+    for (const userData of defaultUsers) {
+      const exists = await repository.findOne({
+        where: { email: userData.email },
+      });
+
+      if (!exists) {
+        await repository.save(repository.create(userData));
+        console.log(`✅ Created default user: ${userData.email}`);
+      }
+    }
+  }
+  catch (error) {
+    // Не критично, если не удалось создать пользователей
+    console.warn('⚠️ Could not create default users:', error);
   }
 };
 
