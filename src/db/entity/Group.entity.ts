@@ -12,7 +12,12 @@ export class Group {
   @Column()
   contacts!: string;
 
-  @OneToMany('Student', 'group', {
+  @OneToMany(() => {
+    // Ленивая загрузка для избежания циклической зависимости при инициализации
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { Student } = require('./Student.entity');
+    return Student;
+  }, (student: Student) => student.group, {
     cascade: false, // Отключено для избежания циклической зависимости при сохранении
     eager: false,
   })
