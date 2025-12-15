@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
-import type { Group } from './Group.entity';
+import { Group } from './Group.entity';
 
 @Entity('students')
 export class Student {
@@ -21,7 +21,7 @@ export class Student {
   @Column({ default: '' })
   contacts?: string;
 
-  @ManyToOne('Group', 'students')
+  @ManyToOne(() => Group, group => group.students)
   @JoinColumn({ name: 'groupId' })
   group!: Group;
 
