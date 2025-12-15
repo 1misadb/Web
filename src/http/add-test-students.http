@@ -1,0 +1,3 @@
+### Добавление тестовых студентов (10 случайных студентов)
+GET http://localhost:3000/api/students/add-test
+Content-Type: application/json

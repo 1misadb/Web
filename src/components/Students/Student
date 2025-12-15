@@ -1,4 +1,0 @@
-<Student
-student={student}
-onDelete={onDeleteHandler}
-/>
