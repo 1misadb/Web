@@ -26,7 +26,7 @@ export class Student {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { Group } = require('./Group.entity');
     return Group;
-  }, (group: Group) => group.students)
+  })
   @JoinColumn({ name: 'groupId' })
   group!: Group;
 
