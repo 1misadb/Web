@@ -1,4 +1,5 @@
 import { Group } from './entity/Group.entity';
+import { Student } from './entity/Student.entity';
 import AppDataSource, { dbInit } from './AppDataSource';
 import type GroupInterface from '@/types/GroupInterface';
 
@@ -7,15 +8,29 @@ const getGroupRepository = async (): Promise<ReturnType<typeof AppDataSource.get
   return AppDataSource.getRepository(Group);
 };
 
+const getStudentRepository = async (): Promise<ReturnType<typeof AppDataSource.getRepository>> => {
+  await dbInit();
+  return AppDataSource.getRepository(Student);
+};
+
 /**
  * Получение групп
  */
 export const getGroupsDb = async (): Promise<GroupInterface[]> => {
-  const repository = await getGroupRepository();
-  // Явно загружаем связанных студентов
-  return await repository.find({
-    relations: ['students'], // это загрузит связанных студентов
-  }) as GroupInterface[];
+  const groupRepository = await getGroupRepository();
+  const studentRepository = await getStudentRepository();
+  
+  const groups = await groupRepository.find() as GroupInterface[];
+  
+  // Загружаем студентов для каждой группы вручную
+  for (const group of groups) {
+    const students = await studentRepository.find({
+      where: { groupId: group.id },
+    });
+    group.students = students as any;
+  }
+  
+  return groups;
 };
 
 /**
@@ -27,11 +42,14 @@ export const addGroupsDb = async (groupFields: Omit<GroupInterface, 'id'>): Prom
   const newGroup = await repository.save({
     ...group,
     ...groupFields,
-  });
-
-  // Загружаем группу со студентами для возврата
-  return await repository.findOne({
-    where: { id: newGroup.id },
-    relations: ['students'],
   }) as GroupInterface;
+
+  // Загружаем студентов для группы вручную
+  const studentRepository = await getStudentRepository();
+  const students = await studentRepository.find({
+    where: { groupId: newGroup.id },
+  });
+  newGroup.students = students as any;
+
+  return newGroup;
 };
