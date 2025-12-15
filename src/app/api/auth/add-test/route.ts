@@ -7,11 +7,13 @@ const defaultUsers = [
     email: 'admin@example.com',
     fullName: 'Администратор Системы',
     password: hashPassword('admin123'),
+    isActive: true,
   },
   {
     email: 'manager@example.com',
     fullName: 'Менеджер Учебного Отдела',
     password: hashPassword('manager123'),
+    isActive: true,
   },
 ];
 

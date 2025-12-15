@@ -19,7 +19,16 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const user = await userService.verifyCredentials(email, password);
 
-    if (!user || !user.isActive) {
+    if (!user) {
+      console.log('User not found:', email);
+      return NextResponse.json(
+        { message: 'Неверный логин или пароль' },
+        { status: 401 },
+      );
+    }
+
+    if (!user.isActive) {
+      console.log('User is not active:', email);
       return NextResponse.json(
         { message: 'Неверный логин или пароль' },
         { status: 401 },
