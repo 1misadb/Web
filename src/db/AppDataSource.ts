@@ -24,8 +24,8 @@ const config: DataSourceOptions = {
       type: 'sqlite',
       database: process.env.DB ?? './db/vki-web.db',
     }),
-  synchronize: process.env.NODE_ENV !== 'production',
-  migrationsRun: process.env.NODE_ENV === 'production',
+  synchronize: true, // Автоматическое создание/обновление схемы БД
+  migrationsRun: false,
   logging: false,
   entities: [Student, Group, User],
 };

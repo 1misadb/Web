@@ -13,9 +13,10 @@ export class Group {
   contacts!: string;
 
   @OneToMany(() => {
-    // Динамический импорт для избежания циклической зависимости
+    // Ленивая загрузка для избежания циклической зависимости
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    return require('./Student.entity').Student;
+    const { Student } = require('./Student.entity');
+    return Student;
   }, (student: Student) => student.group, {
     cascade: true,
     eager: false,

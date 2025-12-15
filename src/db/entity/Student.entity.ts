@@ -22,9 +22,10 @@ export class Student {
   contacts?: string;
 
   @ManyToOne(() => {
-    // Динамический импорт для избежания циклической зависимости
+    // Ленивая загрузка для избежания циклической зависимости
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    return require('./Group.entity').Group;
+    const { Group } = require('./Group.entity');
+    return Group;
   }, (group: Group) => group.students)
   @JoinColumn({ name: 'groupId' })
   group!: Group;
