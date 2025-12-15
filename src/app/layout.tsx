@@ -14,6 +14,7 @@ import '@/styles/globals.scss';
 import { META_DESCRIPTION, META_TITLE } from '@/constants/meta';
 import { getStudentsApi } from '@/api/studentsApi';
 import { verifyAccessToken } from '@/utils/jwt';
+import type StudentInterface from '@/types/StudentInterface';
 
 export const metadata: Metadata = {
   title: META_TITLE,
